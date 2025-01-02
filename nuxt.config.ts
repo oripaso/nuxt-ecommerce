@@ -25,4 +25,8 @@ export default defineNuxtConfig({
     PG_PASSWORD: process.env.PG_PASSWORD,
     PG_PORT: process.env.PG_PORT,
   },
+  typescript: {
+    typeCheck: true,
+    strict: false,
+  },
 });
