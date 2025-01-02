@@ -7,14 +7,14 @@ const config = {
   wrapAround: true,
   transition: 500,
 };
-const products = props.data.products;
+const products = props.data;
 </script>
 
 <template>
   <Carousel v-bind="config">
     <Slide v-for="slide in products" :key="slide">
       <div class="carousel__item">
-        <slider-image :url="slide.url" />
+        <slider-image :url="slide.image_url" />
       </div>
     </Slide>
 
