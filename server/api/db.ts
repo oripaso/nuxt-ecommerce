@@ -5,59 +5,73 @@ export interface Product {
   product_name: string; // Name of the product
   category_name: string; // Name of the category the product belongs to
   category_id: number; // ID of the category
-  name: string; // Product name
   description: string | null; // Product description (optional)
   product_id: number; // Unique ID of the product
-  price: string; // Price of the product as a string
+  price: number; // Price of the product as a string
   image_url: string; // URL for the product image
 }
 
 export interface Category {
   category_name: string; // Name of the category
+  category_id: number; // Unique ID of the category
   products: Product[]; // Array of products in the category
 }
 
 export type ProductData = Category[];
 
-export const fetchCategoriesWithProducts = async (): Promise<ProductData[]> => {
+
+export const fetchCategoriesWithProducts = async (): Promise<Category[]> => {
   try {
     const sql = usePostgres();
 
     // Fetch categories and their products
-    const categories = await sql`
-              SELECT c.name as category_name,
-                    p.name as product_name,
-                    c.*,
-                    p.* 
-            FROM categories c
-            JOIN products p ON p.category_id = c.category_id`;
-    // Ensure the database connection is closed after the request is processed
+    const categories: any[] = await sql`
+      SELECT c.name AS category_name,
+             c.category_id,
+             p.name AS product_name,
+             p.product_id,
+             p.category_id,
+             p.description,
+             p.price,
+             p.image_url
+      FROM categories c
+      JOIN products p ON p.category_id = c.category_id`;
+
+    // Close the database connection
     await sql.end();
 
-    const reduced = categories.reduce((acc, c) => {
-      // Find the existing category in the accumulator
-      let category = acc.find(
-        (item: any) => item.category_name === c.category_name
-      );
+    // Transform data into the desired structure
+    const reduced: Category[] = categories.reduce((acc: Category[], c: any) => {
+      // Find existing category
+      let category = acc.find((item) => item.category_id === c.category_id);
 
-      // If the category doesn't exist, create it
+      // If not found, create a new category
       if (!category) {
-        category = { category_name: c.category_name, products: [] };
+        category = {
+          category_name: c.category_name,
+          category_id: c.category_id,
+          products: [],
+        };
         acc.push(category);
       }
 
-      // Add the product to the category's products array
+      // Add product to the category's products array
       category.products.push({
         product_name: c.product_name,
-        ...c, // Include other product-related fields if necessary
+        category_name: c.category_name,
+        category_id: c.category_id,
+        product_id: c.product_id,
+        description: c.description,
+        price: c.price,
+        image_url: c.image_url,
       });
 
       return acc;
     }, []);
 
-    return reduced as unknown as ProductData[];
+    return reduced;
   } catch (error) {
-    console.log(error);
+    console.error("Error in fetchCategoriesWithProducts:", error);
     return [];
   }
 };
