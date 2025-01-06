@@ -1,5 +1,5 @@
 import { defineEventHandler } from "h3";
-import type { Category } from "~/server/api/db";
+import type { Category } from "~/server/services/db";
 
 export default defineEventHandler(async (event) => {
   try {

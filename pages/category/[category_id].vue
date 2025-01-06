@@ -21,18 +21,11 @@
       </div>
 
       <div class="products-container">
-        <div
+        <productcomp
           v-for="product in filteredAndSortedProducts"
           :key="product.product_id"
-          class="product"
-        >
-          <img :src="product.image_url" :alt="product.product_name" />
-          <div class="product-info">
-            <h3 class="product-name">{{ product.product_name }}</h3>
-            <p class="product-description">{{ product.description }}</p>
-            <p class="product-price">₪{{ product.price }}</p>
-          </div>
-        </div>
+          :product="product"
+        />
       </div>
     </div>
     <div v-else>
@@ -44,11 +37,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import type { Category } from "~/server/api/db";
+import type { Category } from "~/server/services/db";
 
 const route = useRoute();
 const category = ref<Category>(null);
-
 
 const searchQuery = ref("");
 const sortOption = ref("name-asc");
@@ -63,16 +55,13 @@ onMounted(async () => {
   }
 });
 
-
 const filteredAndSortedProducts = computed(() => {
   if (!category.value) return [];
 
-  
   let products = category.value.products.filter((product) =>
     product.product_name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 
-  
   if (sortOption.value === "name-asc") {
     products.sort((a, b) => a.product_name.localeCompare(b.product_name));
   } else if (sortOption.value === "name-desc") {
@@ -88,7 +77,6 @@ const filteredAndSortedProducts = computed(() => {
 </script>
 
 <style>
-
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -110,7 +98,6 @@ const filteredAndSortedProducts = computed(() => {
   margin: 0;
 }
 
-
 .filters {
   display: flex;
   justify-content: space-between;
@@ -130,7 +117,6 @@ const filteredAndSortedProducts = computed(() => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   direction: rtl;
 }
-
 
 .products-container {
   display: grid;
@@ -179,7 +165,6 @@ const filteredAndSortedProducts = computed(() => {
   font-weight: bold;
   color: #e74c3c;
 }
-
 
 .loading-text {
   text-align: center;

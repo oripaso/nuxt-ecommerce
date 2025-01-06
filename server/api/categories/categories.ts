@@ -1,5 +1,5 @@
 import { defineEventHandler } from "h3";
-import { fetchCategoriesWithProducts } from "../db";
+import { fetchCategoriesWithProducts } from "../../services/fetchdata";
 
 export default defineEventHandler(async () => {
   try {
