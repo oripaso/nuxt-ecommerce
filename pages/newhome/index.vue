@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { reactive, onMounted } from "vue";
-import type { Category } from "~/server/api/db";
+import type { Category } from "~/server/services/db";
 
 const categories = reactive<Category[]>([]);
 
@@ -30,10 +30,8 @@ onMounted(async () => {
 });
 </script>
 
-
-
 <style scoped>
-.category_link{
+.category_link {
   direction: rtl;
 }
 </style>
