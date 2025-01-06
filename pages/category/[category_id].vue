@@ -4,14 +4,19 @@
       <h1 class="category-title">{{ category?.category_name }}</h1>
     </header>
 
+    <!-- back button to navigate to the homepage -->
+    <button class="back-btn" @click="goToHomePage">חזור אחורה</button>
+
     <div v-if="category">
       <div class="filters">
+        <!-- search input for filtering products -->
         <input
           v-model="searchQuery"
           type="text"
           placeholder="חפש מוצר..."
           class="search-input"
         />
+        <!-- dropdown to sort products -->
         <select v-model="sortOption" class="sort-select">
           <option value="name-asc">מיין לפי שם (א' עד ת')</option>
           <option value="name-desc">מיין לפי שם (ת' עד א')</option>
@@ -20,6 +25,7 @@
         </select>
       </div>
 
+      <!-- display products using a custom product component -->
       <div class="products-container">
         <productcomp
           v-for="product in filteredAndSortedProducts"
@@ -29,6 +35,7 @@
       </div>
     </div>
     <div v-else>
+      <!-- loading text if category is not yet loaded -->
       <p class="loading-text">טוען מוצרים...</p>
     </div>
   </div>
@@ -36,32 +43,38 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import type { Category } from "~/server/services/db";
 
 const route = useRoute();
+const router = useRouter();
 const category = ref<Category>(null);
 
+// state variables for search and sorting
 const searchQuery = ref("");
 const sortOption = ref("name-asc");
 
+// fetch category data on component mount
 onMounted(async () => {
   try {
     const categoryId = route.params.category_id;
     const response = await $fetch<Category>(`/api/categories/${categoryId}`);
     category.value = response;
   } catch (error) {
-    console.error("Error fetching products for category:", error);
+    console.error("error fetching products for category:", error);
   }
 });
 
+// computed property for filtering and sorting products
 const filteredAndSortedProducts = computed(() => {
   if (!category.value) return [];
 
+  // filter products by search query
   let products = category.value.products.filter((product) =>
     product.product_name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 
+  // sort products based on selected option
   if (sortOption.value === "name-asc") {
     products.sort((a, b) => a.product_name.localeCompare(b.product_name));
   } else if (sortOption.value === "name-desc") {
@@ -74,6 +87,11 @@ const filteredAndSortedProducts = computed(() => {
 
   return products;
 });
+
+// navigate to the homepage
+function goToHomePage() {
+  router.push("/newhome");
+}
 </script>
 
 <style>
@@ -116,6 +134,7 @@ const filteredAndSortedProducts = computed(() => {
   max-width: 300px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   direction: rtl;
+  margin-top: 20px; /* ריווח עליון */
 }
 
 .products-container {
@@ -170,5 +189,33 @@ const filteredAndSortedProducts = computed(() => {
   text-align: center;
   font-size: 1.2rem;
   color: #95a5a6;
+}
+
+/* back button styles */
+.back-btn {
+  background-color: #4caf50;
+  border-radius: 25px;
+  padding: 15px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.3s;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+.back-btn:hover {
+  background-color: #45a049;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+.back-btn:active {
+  background-color: #3e8e41;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transform: translateY(2px);
 }
 </style>
