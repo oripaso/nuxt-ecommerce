@@ -1,4 +1,4 @@
-import type { Category } from "./db";
+import type { Category, Product } from "./db";
 
 export const fetchCategoriesWithProducts = async (): Promise<Category[]> => {
   try {
@@ -21,7 +21,7 @@ export const fetchCategoriesWithProducts = async (): Promise<Category[]> => {
     await sql.end();
 
     // Transform data into the desired structure
-    const reduced: Category[] = categories.reduce((acc: Category[], c: any) => {
+    const reduced: Category[] = categories.reduce((acc: Category[], c: Product) => {
       // Find existing category
       let category = acc.find((item) => item.category_id === c.category_id);
 
