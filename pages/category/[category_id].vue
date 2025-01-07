@@ -75,14 +75,28 @@ const filteredAndSortedProducts = computed(() => {
   );
 
   // sort products based on selected option
-  if (sortOption.value === "name-asc") {
-    products.sort((a, b) => a.product_name.localeCompare(b.product_name));
-  } else if (sortOption.value === "name-desc") {
-    products.sort((a, b) => b.product_name.localeCompare(a.product_name));
-  } else if (sortOption.value === "price-asc") {
-    products.sort((a, b) => a.price - b.price);
-  } else if (sortOption.value === "price-desc") {
-    products.sort((a, b) => b.price - a.price);
+  // if (sortOption.value === "name-asc") {
+  //   products.sort((a, b) => a.product_name.localeCompare(b.product_name));
+  // } else if (sortOption.value === "name-desc") {
+  //   products.sort((a, b) => b.product_name.localeCompare(a.product_name));
+  // } else if (sortOption.value === "price-asc") {
+  //   products.sort((a, b) => a.price - b.price);
+  // } else if (sortOption.value === "price-desc") {
+  //   products.sort((a, b) => b.price - a.price);
+  // }
+
+  const localeCompareSort = (a, b) =>
+    a.product_name.localeCompare(b.product_name);
+  const priceSort = (a, b) => b.price - a.price;
+  const hashMap = {
+    "name-asc": localeCompareSort,
+    "name-desc": localeCompareSort,
+    "price-asc": priceSort,
+    "price-desc": priceSort,
+  };
+
+  if (hashMap[sortOption.value]) {
+    products.sort(hashMap[sortOption.value]);
   }
 
   return products;
