@@ -29,4 +29,9 @@ export default defineNuxtConfig({
     typeCheck: true,
     strict: false,
   },
+  nitro: {
+    externals: {
+      inline: ["pg"], 
+    },
+  },
 });
