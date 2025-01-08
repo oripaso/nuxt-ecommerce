@@ -1,11 +1,14 @@
 import { defineEventHandler } from "h3";
+import { usePg } from "../../utils/pg";
 import type { Category } from "~/server/services/db";
 
 export default defineEventHandler(async (event) => {
+  let client = null;
+
   try {
     const params = event.context.params;
 
-    // validate that parameters are defined
+    // Validate that parameters are defined
     if (!params || !params.category_id) {
       throw new Error("Missing category_id in request parameters");
     }
@@ -15,10 +18,12 @@ export default defineEventHandler(async (event) => {
       throw new Error("Invalid category_id");
     }
 
-    const sql = usePostgres();
+    // Initialize PG client
+    client = usePg();
+    await client.connect();
 
     // Fetch category with products
-    const results = await sql`
+    const query = `
       SELECT c.name AS category_name,
              c.category_id,
              p.name AS product_name,
@@ -28,13 +33,12 @@ export default defineEventHandler(async (event) => {
              p.image_url
       FROM categories c
       LEFT JOIN products p ON p.category_id = c.category_id
-      WHERE c.category_id = ${category_id}`;
+      WHERE c.category_id = $1`;
 
-    // Close the database connection
-    await sql.end();
+    const result = await client.query(query, [category_id]);
 
     // Transform data into the desired structure
-    if (results.length === 0) {
+    if (result.rows.length === 0) {
       return {
         statusCode: 404,
         message: "Category not found",
@@ -42,9 +46,9 @@ export default defineEventHandler(async (event) => {
     }
 
     const category: Category = {
-      category_name: results[0].category_name,
-      category_id: results[0].category_id,
-      products: results.map((product) => ({
+      category_name: result.rows[0].category_name,
+      category_id: result.rows[0].category_id,
+      products: result.rows.map((product) => ({
         product_name: product.product_name,
         category_name: product.category_name,
         category_id: product.category_id,
@@ -66,5 +70,9 @@ export default defineEventHandler(async (event) => {
       statusCode: 500,
       message: error instanceof Error ? error.message : "Internal server error",
     };
+  } finally {
+    if (client) {
+      await client.end();
+    }
   }
 });

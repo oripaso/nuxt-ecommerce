@@ -1,11 +1,16 @@
+import { usePg } from "../utils/pg";
 import type { Category, Product } from "./db";
 
 export const fetchCategoriesWithProducts = async (): Promise<Category[]> => {
+  let client = null;
+
   try {
-    const sql = usePostgres();
+    // Initialize PG client
+    client = usePg();
+    await client.connect();
 
     // Fetch categories and their products
-    const categories: any[] = await sql`
+    const result = await client.query(`
       SELECT c.name AS category_name,
              c.category_id,
              p.name AS product_name,
@@ -15,10 +20,10 @@ export const fetchCategoriesWithProducts = async (): Promise<Category[]> => {
              p.price,
              p.image_url
       FROM categories c
-      JOIN products p ON p.category_id = c.category_id`;
+      JOIN products p ON p.category_id = c.category_id
+    `);
 
-    // Close the database connection
-    await sql.end();
+    const categories = result.rows;
 
     // Transform data into the desired structure
     const reduced: Category[] = categories.reduce((acc: Category[], c: Product) => {
@@ -53,5 +58,10 @@ export const fetchCategoriesWithProducts = async (): Promise<Category[]> => {
   } catch (error) {
     console.error("Error in fetchCategoriesWithProducts:", error);
     return [];
+  } finally {
+    // Ensure the connection is closed
+    if (client) {
+      await client.end();
+    }
   }
 };
