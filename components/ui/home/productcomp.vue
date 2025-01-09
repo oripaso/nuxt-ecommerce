@@ -33,7 +33,7 @@ defineProps<{
 
 .product img {
   width: 100%;
-  height: 200px;
+  height: 20vh;
   object-fit: cover;
 }
 

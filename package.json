@@ -12,6 +12,7 @@
     "start": "node .output/server/index.mjs"
   },
   "dependencies": {
+    "@mdi/font": "^7.4.47",
     "@nuxt/image": "^1.8.1",
     "@nuxthub/core": "^0.8.10",
     "@nuxtjs/i18n": "^9.1.1",
@@ -29,6 +30,8 @@
     "@types/pg": "^8.11.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
-    "vue-tsc": "^2.1.10"
+    "vite-plugin-vuetify": "^2.0.4",
+    "vue-tsc": "^2.1.10",
+    "vuetify": "^3.7.6"
   }
 }

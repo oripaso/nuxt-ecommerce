@@ -1,12 +1,23 @@
+import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+//TODO - // @ts-expect-error
+
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   modules: [
+    (_options, nuxt) => {
+      nuxt.hooks.hook("vite:extendConfig", (config) => {
+        // @ts-ignore
+        config.plugins.push(vuetify({ autoImport: true }));
+      });
+    },
     "@nuxtjs/i18n",
     "@nuxt/image",
     "vue3-carousel-nuxt",
     "@nuxthub/core",
+   
   ],
   i18n: {
     vueI18n: "./plugin/i18n.js", // if you are using custom path, default
@@ -31,7 +42,19 @@ export default defineNuxtConfig({
   },
   nitro: {
     externals: {
-      inline: ["pg"], 
+      inline: ["pg"],
     },
   },
+  build: {
+    transpile: ["vuetify"],
+  },
+  vite: {
+    vue: {
+      template: {
+        transformAssetUrls,
+      },
+    },
+  },
+  
+
 });
