@@ -7,7 +7,7 @@
         </header>
 
         <!-- back button to navigate to the homepage -->
-        <v-btn color="red" @click="goToHomePage">חזור אחורה</v-btn>
+        <v-btn color="red" @click="goToLastPage">חזור אחורה</v-btn>
         <div class="filters">
           <!-- search input for filtering products -->
           <input
@@ -106,8 +106,8 @@ const filteredAndSortedProducts = computed(() => {
 });
 
 // navigate to the homepage
-function goToHomePage() {
-  router.push("/home");
+function goToLastPage() {
+  router.go(-1); // go back to the previous page
 }
 </script>
 
