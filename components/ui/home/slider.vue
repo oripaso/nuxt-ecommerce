@@ -14,7 +14,7 @@ const products = props.data;
   <Carousel v-bind="config">
     <Slide v-for="slide in products" :key="slide">
       <div class="carousel__item">
-        <slider-image :url="slide.image_url" />
+        <slider-image :product="slide" />
       </div>
     </Slide>
 

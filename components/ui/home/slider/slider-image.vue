@@ -1,6 +1,6 @@
 <template>
-  <NuxtImg :src="url" :placeholder="[30, 20]" class="rounded" />
+  <productcomp :product="product"/>
 </template>
 <script setup>
-const props = defineProps(["url"]);
+const props = defineProps(["product"]);
 </script>

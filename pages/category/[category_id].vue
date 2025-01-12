@@ -1,44 +1,47 @@
 <template>
-  <div class="page-container">
-    <header class="page-header">
-      <h1 class="category-title">{{ category?.category_name }}</h1>
-    </header>
+  <v-container>
+    <v-row>
+      <v-col>
+        <header class="page-header">
+          <h1 class="category-title">{{ category?.category_name }}</h1>
+        </header>
 
-    <!-- back button to navigate to the homepage -->
-    <button class="back-btn" @click="goToHomePage">חזור אחורה</button>
-
-    <div v-if="category">
-      <div class="filters">
-        <!-- search input for filtering products -->
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="חפש מוצר..."
-          class="search-input"
-        />
-        <!-- dropdown to sort products -->
-        <select v-model="sortOption" class="sort-select">
-          <option value="name-asc">מיין לפי שם (א' עד ת')</option>
-          <option value="name-desc">מיין לפי שם (ת' עד א')</option>
-          <option value="price-asc">מיין לפי מחיר (נמוך לגבוה)</option>
-          <option value="price-desc">מיין לפי מחיר (גבוה לנמוך)</option>
-        </select>
-      </div>
-
-      <!-- display products using a custom product component -->
-      <div class="products-container">
-        <productcomp
-          v-for="product in filteredAndSortedProducts"
-          :key="product.product_id"
-          :product="product"
-        />
-      </div>
-    </div>
-    <div v-else>
-      <!-- loading text if category is not yet loaded -->
-      <p class="loading-text">טוען מוצרים...</p>
-    </div>
-  </div>
+        <!-- back button to navigate to the homepage -->
+        <v-btn color="red" @click="goToHomePage">חזור אחורה</v-btn>
+        <div class="filters">
+          <!-- search input for filtering products -->
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="חפש מוצר..."
+            class="search-input"
+          />
+          <!-- dropdown to sort products -->
+          <select v-model="sortOption" class="sort-select">
+            <option value="name-asc">מיין לפי שם (א' עד ת')</option>
+            <option value="name-desc">מיין לפי שם (ת' עד א')</option>
+            <option value="price-asc">מיין לפי מחיר (נמוך לגבוה)</option>
+            <option value="price-desc">מיין לפי מחיר (גבוה לנמוך)</option>
+          </select>
+        </div>
+        <div v-if="category">
+          <!-- display products using a custom product component -->
+          <div class="products-container">
+            <productcomp
+              v-for="product in filteredAndSortedProducts"
+              :key="product.product_id"
+              :product="product"
+            />
+          </div>
+        </div>
+        <v-row v-else>
+          <v-col v-for="n in 4" :col="n">
+            <v-skeleton-loader type="card"></v-skeleton-loader>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -104,20 +107,11 @@ const filteredAndSortedProducts = computed(() => {
 
 // navigate to the homepage
 function goToHomePage() {
-  router.push("/newhome");
+  router.push("/home");
 }
 </script>
 
 <style>
-.page-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: "Arial", sans-serif;
-  background-color: #f9f9f9;
-  color: #333;
-}
-
 .page-header {
   text-align: center;
   margin-bottom: 20px;
