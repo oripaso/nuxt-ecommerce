@@ -35,7 +35,7 @@ const categories = reactive<Category[]>([]);
 
 onMounted(async () => {
   try {
-    const response = await $fetch<Category[]>("/api/categories/categories");
+    const response = await $fetch<Category[]>("/api/categories/fetchcategories");
     categories.push(...response);
     console.log("Fetched categories:", response);
   } catch (error) {

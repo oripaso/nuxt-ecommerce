@@ -1,55 +1,59 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col>
-        <v-form @submit.prevent="onSubmit">
-          <!-- Product Name -->
-          <v-text-field
-            v-model="product_name"
-            v-bind="productNameAttrs"
-            label="שם המוצר"
-          ></v-text-field>
+  <admin-layout>
+    <v-container>
+      <v-row>
+        <v-col>
+          <v-form @submit.prevent="onSubmit">
+            <!-- Product Name -->
+            <v-text-field
+              v-model="product_name"
+              v-bind="productNameAttrs"
+              label="שם המוצר"
+            ></v-text-field>
 
-          <!-- Category Name -->
-          <v-text-field
-            v-model="category_name"
-            v-bind="categoryNameAttrs"
-            label="שם הקטגוריה"
-          ></v-text-field>
+            <!-- Category Name -->
+            <v-text-field
+              v-model="category_name"
+              v-bind="categoryNameAttrs"
+              label="שם הקטגוריה"
+            ></v-text-field>
 
-          <!-- Description -->
-          <v-textarea
-            v-model="description"
-            v-bind="descriptionAttrs"
-            label="תיאור המוצר"
-          ></v-textarea>
+            <!-- Description -->
+            <v-textarea
+              v-model="description"
+              v-bind="descriptionAttrs"
+              label="תיאור המוצר"
+            ></v-textarea>
 
-          <!-- Price -->
-          <v-text-field
-            v-model="price"
-            v-bind="priceAttrs"
-            label="מחיר"
-            type="number"
-          ></v-text-field>
+            <!-- Price -->
+            <v-text-field
+              v-model="price"
+              v-bind="priceAttrs"
+              label="מחיר"
+              type="number"
+            ></v-text-field>
 
-          <!-- Image URL -->
-          <v-text-field
-            v-model="image_url"
-            v-bind="imageUrlAttrs"
-            label="כתובת URL של התמונה"
-          ></v-text-field>
+            <!-- Image URL -->
+            <v-text-field
+              v-model="image_url"
+              v-bind="imageUrlAttrs"
+              label="כתובת URL של התמונה"
+            ></v-text-field>
 
-          <v-btn type="submit" color="primary">שמור</v-btn>
-        </v-form>
-      </v-col>
-    </v-row>
-  </v-container>
+            <v-btn type="submit" color="primary">שמור</v-btn>
+          </v-form>
+        </v-col>
+      </v-row>
+    </v-container>
+  </admin-layout>
 </template>
 
 <script setup lang="ts">
+import adminLayout from "@/layouts/admin_layout.vue";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import { z } from "zod";
+
 const vuetifyConfig = (state) => ({
   props: {
     "error-messages": state.errors,
