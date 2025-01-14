@@ -17,6 +17,6 @@ export interface Category {
   products: Product[]; // Array of products in the category
 }
 
-export type ProductData = Category[];
+
 
 
