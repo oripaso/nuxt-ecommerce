@@ -11,12 +11,15 @@
               label="שם המוצר"
             ></v-text-field>
 
-            <!-- Category Name -->
-            <v-text-field
-              v-model="category_name"
+            <!-- Category Name Dropdown -->
+            <v-select
+              v-model="selectedCategory"
+              :items="categories"
+              item-title="category_name"
+              item-value="category_id"
               v-bind="categoryNameAttrs"
               label="שם הקטגוריה"
-            ></v-text-field>
+            ></v-select>
 
             <!-- Description -->
             <v-textarea
@@ -53,20 +56,18 @@ import adminLayout from "@/layouts/admin_layout.vue";
 import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import { z } from "zod";
+import { ref, onMounted } from "vue";
 
-const vuetifyConfig = (state) => ({
-  props: {
-    "error-messages": state.errors,
-  },
-});
+// Categories array to populate the dropdown
+const categories = ref([]);
 
-// Define the Zod schema
+// Define the Zod schema for validation
 const schema = z.object({
   product_name: z
     .string()
     .nonempty("יש לכתוב שם מוצר")
     .min(3, "שם המוצר צריך להכיל לפחות 3 תווים."),
-  category_name: z.string().nonempty("יש לכתוב שם קטגוריה"),
+  selectedCategory: z.number().positive("יש לבחור קטגוריה חוקית."),
   description: z.string().nullable(),
   price: z.preprocess(
     (val) => parseFloat(val as string),
@@ -81,22 +82,22 @@ const { defineField, validate } = useForm({
 });
 
 // Define fields with attributes for easy binding
-const [product_name, productNameAttrs] = defineField(
-  "product_name",
-  vuetifyConfig
-);
-const [category_name, categoryNameAttrs] = defineField(
-  "category_name",
-  vuetifyConfig
-);
-const [description, descriptionAttrs] = defineField(
-  "description",
-  vuetifyConfig
-);
-const [price, priceAttrs] = defineField("price", vuetifyConfig);
-const [image_url, imageUrlAttrs] = defineField("image_url", vuetifyConfig);
+const [product_name, productNameAttrs] = defineField("product_name");
+const [selectedCategory, categoryNameAttrs] = defineField("selectedCategory");
+const [description, descriptionAttrs] = defineField("description");
+const [price, priceAttrs] = defineField("price");
+const [image_url, imageUrlAttrs] = defineField("image_url");
 
-// Refactored submit handler
+// Fetch categories on component mount
+onMounted(async () => {
+  try {
+    const result = await $fetch("/api/categories/fetchcategories");
+    categories.value = result;
+  } catch (error) {
+    console.error("Failed to fetch categories:", error);
+  }
+});
+
 const onSubmit = async () => {
   const { valid, errors, values } = await validate();
 
@@ -106,11 +107,40 @@ const onSubmit = async () => {
     return;
   }
 
-  console.log("Form submitted successfully with values:", values);
-  alert("Product submitted successfully!");
+  // Prepare payload to send
+  const payload = {
+    product_name: values.product_name,
+    category_id: values.selectedCategory,
+    description: values.description || null, // Ensure null for empty description
+    price: values.price,
+    image_url: values.image_url,
+  };
 
-  // You can add your API submission logic here
-  // For example:
-  // await axios.post('/api/products', values);
+  try {
+    const response = await $fetch("/api/products/add_product", {
+      method: "POST",
+      body: payload,
+    });
+
+    if (response) {
+      alert("המוצר נוסף בהצלחה!");
+      // Clear form after successful submission
+      resetForm();
+    } else {
+      alert("נכשל להוסיף את המוצר.");
+    }
+  } catch (error) {
+    console.error("Error submitting product:", error);
+    alert(`אירעה שגיאה במהלך שמירת המוצר: ${error.message}`);
+  }
+};
+
+// Reset form fields
+const resetForm = () => {
+  product_name.value = "";
+  selectedCategory.value = null;
+  description.value = "";
+  price.value = "";
+  image_url.value = "";
 };
 </script>
