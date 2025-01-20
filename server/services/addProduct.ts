@@ -1,7 +1,7 @@
 import { usePg } from "../utils/pg";
-import type { Product } from "./db";
+import type { AddProduct, Product } from "./db";
 
-export const addProduct = async (product: Product): Promise<Product> => {
+export const addProduct = async (product: AddProduct): Promise<Product> => {
   let client = null;
 
   try {

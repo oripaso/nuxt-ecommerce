@@ -1,10 +1,9 @@
 import { defineEventHandler, readBody } from "h3";
 import { addProduct } from "~/server/services/addProduct";
-
+import { addProduct as schema } from "@/schemes/products";
 
 export default defineEventHandler(async (event) => {
   try {
-    
     const body = await readBody(event);
 
     const {
@@ -16,37 +15,16 @@ export default defineEventHandler(async (event) => {
       image_url,
     } = body;
 
-    console.log(body);
+    const validationResult = schema.safeParse(body);
 
-    // אימות נתונים
-    if (!product_name || typeof product_name !== "string") {
-      throw new Error(
-        "Invalid input: product_name is required and must be a string."
-      );
+    if (!validationResult.success) {
+      // check if the structure is valid
+      return {
+        status: 400,
+        message: "Invalid request.",
+      };
     }
 
-    if (!category_id || typeof category_id !== "number") {
-      throw new Error(
-        "Invalid input: category_id is required and must be a number."
-      );
-    }
-
-    if (price == null || typeof price !== "number" || price <= 0) {
-      throw new Error(
-        "Invalid input: price is required and must be a positive number."
-      );
-    }
-
-    if (!image_url || typeof image_url !== "string") {
-      throw new Error(
-        "Invalid input: image_url is required and must be a valid URL."
-      );
-    }
-
-
-    const product_id = generateUniqueProductId();
-
- 
     const newProduct = await addProduct({
       product_name,
       category_id,
@@ -54,10 +32,10 @@ export default defineEventHandler(async (event) => {
       price,
       image_url,
       category_name,
-      product_id,
     });
+    console.log("????");
+    
 
- 
     return {
       status: 201,
       message: "Product added successfully!",
@@ -74,7 +52,3 @@ export default defineEventHandler(async (event) => {
     };
   }
 });
-
-function generateUniqueProductId(): number {
-  return Math.floor(Math.random() * 1000000);
-}

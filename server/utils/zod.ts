@@ -1,22 +1,10 @@
 import { ZodSchema } from "zod";
 
-// Validation function for Zod schema
-// export const validateField = (
-//   schema: ZodSchema,
-//   fieldName: string,
-//   inputValue: unknown
-// ) => {
-//   const validation = schema.safeParse({ [fieldName]: inputValue });
-//   console.log({schema, validation,inputValue,fieldName});
-
-//   return validation.success ? true : validation.error.errors[0]?.message || "Invalid value";
-
-// };
 export const validateField = (
   schema: ZodSchema,
   field: string,
   inputValue: unknown
-):string => {
+): string => {
   const value = field;
   console.log(`Validating field: ${field}, Value:`, value, schema, inputValue);
   const result = (schema as any)?.shape[field].safeParse(inputValue);

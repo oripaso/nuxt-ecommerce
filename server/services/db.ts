@@ -17,6 +17,8 @@ export interface Category {
   products: Product[]; // Array of products in the category
 }
 
+export type AddProduct = Omit<Product, "product_id">;
 
+export type UpdateProduct = Partial<Product>;
 
-
+export type DeleteProduct = Pick<Product, "product_id">;

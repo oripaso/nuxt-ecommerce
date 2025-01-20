@@ -4,6 +4,13 @@
       <v-row>
         <v-col>
           <v-form @submit.prevent="onSubmit">
+            <!-- Create/Update Switch -->
+            <v-switch
+              v-model="isUpdateMode"
+              label="עדכון מוצר קיים"
+              color="primary"
+            ></v-switch>
+
             <!-- Product Name -->
             <v-text-field
               v-model="product_name"
@@ -43,7 +50,9 @@
               label="כתובת URL של התמונה"
             ></v-text-field>
 
-            <v-btn type="submit" color="primary">שמור</v-btn>
+            <v-btn type="submit" color="primary">
+              {{ isUpdateMode ? "עדכן" : "שמור" }}
+            </v-btn>
           </v-form>
         </v-col>
       </v-row>
@@ -52,26 +61,14 @@
 </template>
 
 <script setup lang="ts">
-import adminLayout from "@/layouts/admin_layout.vue";
-import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
-import { addProduct as schema , updateProduct } from "@/schemes/products";
-import { ref, onMounted } from "vue";
+import { useForm } from "vee-validate";
+import { ref } from "vue";
+import type { Category } from "~/server/services/db";
+import { addProduct as schema, updateProduct } from "@/schemes/products";
 
-// Categories array to populate the dropdown
-const categories = ref([]);
-
-// Initialize the form with Vee-Validate
-const { defineField, validate } = useForm({
-  validationSchema: toTypedSchema(schema),
-});
-
-// Define fields with attributes for easy binding
-const [product_name, productNameAttrs] = defineField("product_name");
-const [selectedCategory, categoryNameAttrs] = defineField("selectedCategory");
-const [description, descriptionAttrs] = defineField("description");
-const [price, priceAttrs] = defineField("price");
-const [image_url, imageUrlAttrs] = defineField("image_url");
+const isUpdateMode = ref<boolean>(false); // Toggle for Create/Update mode
+const categories = ref<Category[]>([]);
 
 // Fetch categories on component mount
 onMounted(async () => {
@@ -82,7 +79,47 @@ onMounted(async () => {
     console.error("Failed to fetch categories:", error);
   }
 });
+//
+// const formSchema = computed(() => {
+//   return isUpdateMode ? updateProduct : schema;
+// });
 
+// const { defineField, validate, resetForm } = useForm({
+//   validationSchema: toTypedSchema(formSchema.value),
+// });
+
+//////
+
+let form; // Store the form instance globally
+
+const initializeForm = () => {
+  form = useForm({
+    validationSchema: toTypedSchema(isUpdateMode ? updateProduct : schema),
+  });
+};
+
+// Initialize the form initially
+initializeForm();
+
+// Watch for changes in `isUpdateMode` and reinitialize the form
+watch(isUpdateMode, () => {
+  
+
+  initializeForm();
+});
+
+const { defineField, validate, resetForm } = form;
+
+////////
+
+// Define fields with attributes for easy binding
+const [product_name, productNameAttrs] = defineField("product_name");
+const [selectedCategory, categoryNameAttrs] = defineField("selectedCategory");
+const [description, descriptionAttrs] = defineField("description");
+const [price, priceAttrs] = defineField("price");
+const [image_url, imageUrlAttrs] = defineField("image_url");
+
+// Methods
 const onSubmit = async () => {
   const { valid, errors, values } = await validate();
 
@@ -92,6 +129,20 @@ const onSubmit = async () => {
     return;
   }
 
+  if (isUpdateMode.value) {
+    console.log("Updating product:", {
+      product_name: product_name.value,
+      selectedCategory: selectedCategory.value,
+      description: description.value,
+      price: price.value,
+      image_url: image_url.value,
+    });
+    // Add logic for updating the product
+
+    return;
+  }
+
+  /// add product
   // Prepare payload to send
   const payload = {
     product_name: values.product_name,
@@ -100,7 +151,6 @@ const onSubmit = async () => {
     price: values.price,
     image_url: values.image_url,
   };
-
 
   try {
     const response = await $fetch("/api/products/add_product", {
@@ -119,14 +169,5 @@ const onSubmit = async () => {
     console.error("Error submitting product:", error);
     alert(`אירעה שגיאה במהלך שמירת המוצר: ${error.message}`);
   }
-};
-
-// Reset form fields
-const resetForm = () => {
-  product_name.value = "";
-  selectedCategory.value = null;
-  description.value = "";
-  price.value = "";
-  image_url.value = "";
 };
 </script>

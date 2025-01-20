@@ -9,35 +9,7 @@
 
       <!-- Navigation Drawer -->
       <v-navigation-drawer app v-model="drawer" color="blue-grey lighten-4">
-        <v-list>
-          <v-list-item link to="/admin/product">
-            <v-list-item-icon>
-              <v-icon>mdi-package-variant</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Product</v-list-item-title>
-          </v-list-item>
-
-          <v-list-item link to="/admin/category">
-            <v-list-item-icon>
-              <v-icon>mdi-tag</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Category</v-list-item-title>
-          </v-list-item>
-
-          <v-list-item link to="/admin/orders">
-            <v-list-item-icon>
-              <v-icon>mdi-cart</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Orders</v-list-item-title>
-          </v-list-item>
-
-          <v-list-item link to="/admin/analytics">
-            <v-list-item-icon>
-              <v-icon>mdi-chart-line</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Analytics</v-list-item-title>
-          </v-list-item>
-        </v-list>
+        <v-list :items="menuItems"></v-list>
       </v-navigation-drawer>
 
       <!-- Main Content -->
@@ -59,11 +31,43 @@
 import { ref } from "vue";
 
 const drawer = ref(false);
+const menuItems = ref([
+  {
+    title: "Product",
+    value: 1,
+    props: {
+      prependIcon: "mdi-package-variant",
+      href: "/admin/product",
+    },
+  },
+  {
+    title: "Category",
+    value: 2,
+    props: {
+      prependIcon: "mdi-tag",
+      href: "/admin/category",
+    },
+  },
+  {
+    title: "Orders",
+    value: 3,
+    props: {
+      prependIcon: "mdi-cart",
+      href: "/admin/orders",
+      disabled: true,
+    },
+  },
+  {
+    title: "Analytics",
+    value: 4,
+    props: {
+      prependIcon: "mdi-chart-line",
+      href: "/admin/analytics",
+      disabled: true,
+    },
+  },
+]);
 
-const logout = () => {
-  alert("Logged out successfully.");
-  // Add logout functionality here
-};
 </script>
 
 <style>
